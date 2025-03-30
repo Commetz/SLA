@@ -1,99 +1,39 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Mind</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="gray.css">
-  <link rel="icon" href="cerebro.png" type="image/png"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boi que faz MUUU</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+            margin: 0;
+            background-color: #f8f8f8;
+        }
+        img {
+            cursor: pointer;
+            max-width: 90%;
+            height: auto;
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <div class="title">yey</div>
-    <div class="subtitle">slaa</div>
-    <nav>
-      <a href="#nada">Nada</a>
-      <a href="#bonito">Bonito</a>
-    </nav>
-  </header>
-  <main>
-    <section id="nada">
-      <h2>Nada</h2>
-      <p>Olha os vagalumes e as texturas olha</p>
-    </section>
-    <section id="bonito">
-      <h2>Bonito né?</h2>
-      <p>Ficou top</p>
-    </section>
-  </main>
-  <footer>
-    &copy; 2025 Gabriel Da Silva Mello. Todos os direitos reservados.
-  </footer>
-
-  <div class="fireflies"></div>
-
-  <script>
-    let currentSlide = 0;
-    const slides = document.querySelector('.slides');
-    const totalSlides = document.querySelectorAll('.slide').length;
+    <h1>Clique no boi para ouvir o som!</h1>
+    <img src="boi.png" 
+         alt="Imagem de um boi" 
+         onclick="tocarSom()">
     
-    function updateSlider() {
-      slides.style.transform = 'translateX(-' + (currentSlide * 100) + '%)';
-    }
+    <audio id="somBoi" src="somboi.mp3"></audio>
     
-    function nextSlide() {
-      currentSlide = (currentSlide + 1) % totalSlides;
-      updateSlider();
-    }
-    
-    function prevSlide() {
-      currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
-      updateSlider();
-    }
-    
-    setInterval(nextSlide, 5000);
-
-    window.history.scrollRestoration = "manual";
-
-    window.onload = function() {
-      setTimeout(() => {
-        window.scrollTo(0, 0);
-      }, 0);
-
-      const firefliesContainer = document.querySelector('.fireflies');
-      const numberOfFireflies = 9;
-
-      function generateFirefly() {
-        const firefly = document.createElement('div');
-        firefly.classList.add('firefly');
-
-        const windowHeight = document.documentElement.scrollHeight;
-        const windowWidth = document.documentElement.scrollWidth;
-
-        const topPosition = Math.random() * windowHeight;
-        const leftPosition = Math.random() * windowWidth;
-
-        const animationDuration = 3 + Math.random() * 5; 
-        const animationDelay = Math.random() * 5; 
-
-        firefly.style.top = `${topPosition}px`;
-        firefly.style.left = `${leftPosition}px`;
-        firefly.style.animationDuration = `${animationDuration}s`;
-        firefly.style.animationDelay = `${animationDelay}s`;
-
-        firefliesContainer.appendChild(firefly);
-
-        setTimeout(() => {
-          firefly.remove(); 
-          generateFirefly(); 
-        }, animationDuration * 1000);
-      }
-
-      for (let i = 0; i < numberOfFireflies; i++) {
-        generateFirefly();
-      }
-    };
-  </script>
+    <script>
+        function tocarSom() {
+            document.getElementById('somBoi').play();
+        }
+    </script>
 </body>
 </html>
