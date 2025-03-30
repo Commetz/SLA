@@ -16,7 +16,7 @@ body {
   position: relative;
   min-height: 100vh;
   background-color: #121212;
-  background-image: url('../imagens/textura-velho.png');
+  background-image: url('textura-velho.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -122,7 +122,7 @@ main {
 }
 
 section {
-  background-image: url('../imagens/textura-sujeira.png'); 
+  background-image: url('textura-sujeira.png'); 
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
