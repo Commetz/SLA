@@ -1,39 +1,251 @@
+
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boi que faz MUUU</title>
+    <title>Controle de Mão Robótica</title>
     <style>
         body {
+            font-family: 'Arial', sans-serif;
+            background: radial-gradient(circle, #0a0a0a, #1c1c1c);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            text-align: center;
+            position: relative;
+        }
+
+        .hand-container {
+            position: relative;
+            width: 400px;
+            height: 500px;
+        }
+
+        .hand-image {
+            position: center;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0px 0px 10px rgba(0, 255, 255, 0.5));
+        }
+
+        .slider-container {
+            position: absolute;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            height: 100vh;
-            text-align: center;
-            margin: 0;
-            background-color: #f8f8f8;
         }
-        img {
+
+        .slider {
+            appearance: none;
+            width: 130px;
+            height: 8px;
+            background: linear-gradient(90deg, #0ff, #00f);
+            border-radius: 5px;
+            outline: none;
+            transform: rotate(-90deg);
             cursor: pointer;
-            max-width: 90%;
-            height: auto;
+            opacity: 0.9;
+            transition: 0.3s;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
         }
+
+        .slider:hover {
+            opacity: 1;
+            transform: rotate(-90deg) scale(1.1);
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #fff;
+            border: 2px solid #0ff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 5px cyan;
+        }
+
+        .slider-value {
+            margin-top: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #0ff;
+            text-shadow: 0 0 5px #0ff;
+            transition: transform 0.2s ease-in-out;
+            transform: rotate(0deg); /* Removido o efeito de rotação */
+        }
+
+        #close-all {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(90deg, #ff0000, #cc0000);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
+            transition: all 0.3s ease-in-out;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+        }
+
+        #close-all:hover {
+            background: linear-gradient(90deg, #cc0000, #990000);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 1);
+            transform: scale(1.1);
+        }
+
+        #close-all:active {
+            transform: scale(0.95);
+            background: linear-gradient(90deg, #990000, #660000);
+        }
+
+        #open-all {
+            position: absolute;
+            bottom: 100px;
+            right: 20px;
+            padding: 12px 24px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(90deg, #66ff00, #66cc00);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+            transition: all 0.3s ease-in-out;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+        }
+        
+        #open-all:hover {
+            background: linear-gradient(90deg, #66cc00, #669900);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 1);
+            transform: scale(1.1);
+        }
+
+        #open-all:active {
+            transform: scale(0.95);
+            background: linear-gradient(90deg, #669900, #666600);
+        }
+
+        
+        /* Posicionamento correto dos sliders em relação aos dedos */
+        #servo1-container { top: 125px; left: 91px; transform: rotate(-189deg); }  /* Indicador */
+        #servo2-container { top: 110px; left: 147px; transform: rotate(-180deg); } /* Médio */
+        #servo3-container { top: 125px; left: 201px; transform: rotate(-169deg); }  /* Anelar */
+        #servo4-container { top: 155px; left: 250px; transform: rotate(-160deg); } /* Mínimo */
+        #servo5-container { top: 245px; left: 35px; transform: rotate(-220deg); } /* Polegar */
+        #servo6-container { top: 357px; left: 150px; transform: rotate(90deg);} /* Pulso */
+
+        #servo1-value { transform: rotate(189deg); }
+        #servo2-value { transform: rotate(180deg); }
+        #servo3-value { transform: rotate(169deg); }
+        #servo4-value { transform: rotate(160deg); }
+        #servo5-value { transform: rotate(220deg); }
+        #servo6-value { transform: rotate(-90deg); }
+
     </style>
+    <script src="socket.io.min.js"></script>
 </head>
 <body>
-    <h1>Clique no boi para ouvir o som!</h1>
-    <img src="boi.png" 
-         alt="Imagem de um boi" 
-         onclick="tocarSom()">
-    
-    <audio id="somBoi" src="somboi.mp3"></audio>
-    
+    <div class="container">
+        <div class="hand-container">
+            <!-- Imagem da mão robótica -->
+            <img src="mao.png" alt="Mão Robótica" class="hand-image">
+            
+            <!-- Sliders para os dedos -->
+            <div class="slider-container" id="servo1-container">
+                <input type="range" min="0" max="180" value="0" class="slider" id="servo1" oninput="send_data(0, this.value)">
+                <span class="slider-value" id="servo1-value">0°</span>
+            </div>
+            <div class="slider-container" id="servo2-container">
+                <input type="range" min="0" max="180" value="0" class="slider" id="servo2" oninput="send_data(1, this.value)">
+                <span class="slider-value" id="servo2-value">0°</span>
+            </div>
+            <div class="slider-container" id="servo3-container">
+                <input type="range" min="0" max="180" value="0" class="slider" id="servo3" oninput="send_data(2, this.value)">
+                <span class="slider-value" id="servo3-value">0°</span>
+            </div>
+            <div class="slider-container" id="servo4-container">
+                <input type="range" min="0" max="180" value="0" class="slider" id="servo4" oninput="send_data(3, this.value)">
+                <span class="slider-value" id="servo4-value">0°</span>
+            </div>
+            <div class="slider-container" id="servo5-container">
+                <input type="range" min="0" max="180" value="0" class="slider" id="servo5" oninput="send_data(4, this.value)">
+                <span class="slider-value" id="servo5-value">0°</span>
+            </div>
+            <div class="slider-container" id="servo6-container">
+                <input type="range" min="0" max="180" value="0" class="slider" id="servo6" oninput="send_data(5, this.value)">
+                <span class="slider-value" id="servo6-value">0°</span>
+            </div>
+        </div>
+    </div>
+
+    <button id="open-all" onclick="openAllFingers()">Abrir Todos os Dedos</button>
+    <button id="close-all" onclick="closeAllFingers()">Fechar Todos os Dedos</button>
+
     <script>
-        function tocarSom() {
-            document.getElementById('somBoi').play();
+        const servoValues = document.querySelectorAll('.slider-value');
+    
+        const socket = io();
+    
+        const send_data = (motor, amnt) => {
+            const all_movs = get_moveall_int();
+            const valueElement = document.getElementById(`servo${motor + 1}-value`);
+    
+            valueElement.textContent = `${amnt}°`;
+            valueElement.style.transform = `rotate(${valueElement.dataset.rotation}) scale(1.2)`;
+    
+            setTimeout(() => {
+                valueElement.style.transform = `rotate(${valueElement.dataset.rotation}) scale(1)`;
+            }, 200);
+    
+            console.log(motor + ':' + amnt);
+    
+            socket.emit('mov', {
+                'motor': motor,
+                'amnt': amnt,
+                'mov_all': all_movs
+            });
+        };
+    
+        const get_moveall_int = () => {
+            let m = 0;
+            for (let i = 0; i < 6; i++) {
+                const checkbox = document.getElementById(`checkbox${i + 1}`);
+                if (checkbox && checkbox.checked) {
+                    m |= (1 << i);
+                }
+            }
+            return m;
+        };
+
+        function closeAllFingers() {
+            for (let i = 0; i < 5; i++) { 
+                const slider = document.getElementById(`servo${i + 1}`);
+                slider.value = 180; 
+                send_data(i, 180);
+            }
         }
-    </script>
+
+        function openAllFingers() {
+            for (let i = 0; i < 5; i++) { 
+                const slider = document.getElementById(`servo${i + 1}`);
+                slider.value = 0; 
+                send_data(i, 0);
+            }
+        }
+    </script>    
 </body>
 </html>
